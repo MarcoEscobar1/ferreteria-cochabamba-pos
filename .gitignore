@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+.env.local
+
+# Base de datos - no subir esquema SQL
+supabase/
+*.sql
