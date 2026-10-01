@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchSales, fetchSaleById } from '../../api/supabaseApi';
+import { fetchSales, fetchSaleById } from '../../api/demoApi';
 import { useAuthStore } from '../../stores/authStore';
 import { formatCurrency, formatDateTime, formatDateISO } from '../../utils/formatters';
 import { generateReceiptPDF } from '../../utils/pdfExport';
@@ -57,7 +57,7 @@ export default function SalesHistoryPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title="Historial de Ventas"
         description="Registro de tus ventas realizadas"
@@ -108,7 +108,7 @@ export default function SalesHistoryPage() {
         ) : (
           <div className="card overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[480px] text-sm">
                 <thead>
                   <tr className="border-b border-steel-200 bg-steel-50/50">
                     <th className="px-5 py-3 text-left font-semibold text-steel-600">N° Venta</th>

@@ -7,7 +7,7 @@ import {
   createEmployee,
   updateEmployee,
   toggleEmployeeActive,
-} from '../../api/supabaseApi';
+} from '../../api/demoApi';
 import { useAuthStore } from '../../stores/authStore';
 import PageHeader from '../../components/ui/PageHeader';
 import Modal from '../../components/ui/Modal';
@@ -21,8 +21,6 @@ import {
   HiOutlineBan,
   HiOutlineCheckCircle,
   HiOutlineUsers,
-  HiOutlineMail,
-  HiOutlinePhone,
 } from 'react-icons/hi';
 
 const employeeSchema = z.object({
@@ -30,6 +28,7 @@ const employeeSchema = z.object({
   email: z.string().email('Email inválido'),
   phone: z.string().optional(),
   role: z.enum(['admin', 'employee']),
+  password: z.string().min(4, 'Contraseña mínimo 4 caracteres'),
 });
 
 const editEmployeeSchema = z.object({
@@ -67,7 +66,7 @@ export default function EmployeesPage() {
 
   const openCreate = () => {
     setEditing(null);
-    reset({ full_name: '', email: '', phone: '', role: 'employee' });
+    reset({ full_name: '', email: '', phone: '', role: 'employee', password: '' });
     setShowModal(true);
   };
 
@@ -89,7 +88,7 @@ export default function EmployeesPage() {
         toast.success('Empleado actualizado');
       } else {
         await createEmployee(data);
-        toast.success('Invitación enviada al empleado');
+        toast.success('Empleado creado correctamente');
       }
       setShowModal(false);
       loadData();
@@ -127,14 +126,14 @@ export default function EmployeesPage() {
   if (loading) return <Spinner size="lg" />;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title="Empleados"
         description={`${employees.length} empleados registrados`}
         actions={
           <button onClick={openCreate} className="btn-primary">
             <HiOutlinePlus className="h-4 w-4" />
-            Invitar Empleado
+            Nuevo Empleado
           </button>
         }
       />
@@ -144,13 +143,13 @@ export default function EmployeesPage() {
           <EmptyState
             icon={HiOutlineUsers}
             title="Sin empleados"
-            description="Invita a tu primer empleado"
-            action={<button onClick={openCreate} className="btn-primary"><HiOutlinePlus className="h-4 w-4" />Invitar</button>}
+            description="Crea tu primer empleado"
+            action={<button onClick={openCreate} className="btn-primary"><HiOutlinePlus className="h-4 w-4" />Nuevo</button>}
           />
         ) : (
           <div className="card overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[600px] text-sm">
                 <thead>
                   <tr className="border-b border-steel-200 bg-steel-50/50">
                     <th className="px-5 py-3 text-left font-semibold text-steel-600">Empleado</th>
@@ -208,7 +207,7 @@ export default function EmployeesPage() {
         )}
       </div>
 
-      <Modal open={showModal} onClose={() => setShowModal(false)} title={editing ? 'Editar Empleado' : 'Invitar Empleado'} size="md">
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={editing ? 'Editar Empleado' : 'Nuevo Empleado'} size="md">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-steel-700">Nombre completo *</label>
@@ -216,12 +215,18 @@ export default function EmployeesPage() {
             {errors.full_name && <p className="mt-1 text-xs text-red-500">{errors.full_name.message}</p>}
           </div>
           {!editing && (
-            <div>
-              <label className="mb-1 block text-sm font-medium text-steel-700">Email *</label>
-              <input {...register('email')} type="email" className="input-field" placeholder="correo@ejemplo.com" />
-              {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
-              <p className="mt-1 text-xs text-steel-400">Se enviará una invitación a este correo</p>
-            </div>
+            <>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-steel-700">Email *</label>
+                <input {...register('email')} type="email" className="input-field" placeholder="correo@ejemplo.com" />
+                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-steel-700">Contraseña *</label>
+                <input {...register('password')} type="password" className="input-field" placeholder="Mínimo 4 caracteres" />
+                {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
+              </div>
+            </>
           )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -239,7 +244,7 @@ export default function EmployeesPage() {
           <div className="flex justify-end gap-3 border-t border-steel-100 pt-4">
             <button type="button" onClick={() => setShowModal(false)} className="btn-secondary">Cancelar</button>
             <button type="submit" disabled={saving} className="btn-primary">
-              {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Enviar Invitación'}
+              {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear Empleado'}
             </button>
           </div>
         </form>

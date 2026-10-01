@@ -7,7 +7,7 @@ import {
   createCategory,
   updateCategory,
   toggleCategoryActive,
-} from '../../api/supabaseApi';
+} from '../../api/demoApi';
 import PageHeader from '../../components/ui/PageHeader';
 import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -106,7 +106,7 @@ export default function CategoriesPage() {
   if (loading) return <Spinner size="lg" />;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title="Categorías"
         description={`${categories.length} categorías registradas`}

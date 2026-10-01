@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import toast from 'react-hot-toast';
-import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineInformationCircle } from 'react-icons/hi';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -17,7 +17,6 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn(email, password);
-      // Auth state change will update store, then redirect
       const { employee } = useAuthStore.getState();
       if (employee?.role === 'admin') {
         navigate('/admin');
@@ -29,6 +28,16 @@ export default function LoginPage() {
       toast.error(err.message || 'Credenciales inválidas');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fillDemo = (role) => {
+    if (role === 'admin') {
+      setEmail('admin@ferreteria.com');
+      setPassword('admin123');
+    } else {
+      setEmail('empleado@ferreteria.com');
+      setPassword('emp123');
     }
   };
 
@@ -51,6 +60,30 @@ export default function LoginPage() {
             Ferretería Cochabamba
           </h1>
           <p className="mt-2 text-sm text-steel-400">Sistema de Punto de Venta</p>
+        </div>
+
+        {/* Demo credentials hint */}
+        <div className="mb-4 rounded-xl border border-brand-500/30 bg-brand-600/10 p-4">
+          <div className="flex items-start gap-2 mb-3">
+            <HiOutlineInformationCircle className="h-5 w-5 shrink-0 text-brand-400 mt-0.5" />
+            <p className="text-xs text-brand-300 font-medium">Modo Demo — Acceso rápido:</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => fillDemo('admin')}
+              className="flex-1 rounded-lg bg-brand-600/20 px-3 py-2 text-xs font-medium text-brand-300 hover:bg-brand-600/30 transition-colors border border-brand-500/20"
+            >
+              👨‍💼 Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => fillDemo('employee')}
+              className="flex-1 rounded-lg bg-steel-700/50 px-3 py-2 text-xs font-medium text-steel-300 hover:bg-steel-700/70 transition-colors border border-steel-600/20"
+            >
+              👷 Empleado
+            </button>
+          </div>
         </div>
 
         {/* Login Card */}

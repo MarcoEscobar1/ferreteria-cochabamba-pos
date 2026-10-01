@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchDashboardMetrics, fetchSales } from '../../api/supabaseApi';
+import { fetchDashboardMetrics, fetchSales } from '../../api/demoApi';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
@@ -66,14 +66,14 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title="Dashboard"
         description={`Resumen del día — ${new Date().toLocaleDateString('es-BO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
       />
 
       {/* Stat Cards */}
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {statCards.map((stat) => (
           <div key={stat.label} className="card p-5">
             <div className="flex items-center gap-4">
@@ -89,7 +89,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-2">
         {/* Stock Alerts */}
         <div className="card">
           <div className="border-b border-steel-100 px-5 py-4">
@@ -132,28 +132,30 @@ export default function DashboardPage() {
             {recentSales.length === 0 ? (
               <p className="p-5 text-center text-sm text-steel-400">Sin ventas recientes</p>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-steel-100 bg-steel-50/50">
-                    <th className="px-5 py-2 text-left text-xs font-semibold text-steel-500">N°</th>
-                    <th className="px-5 py-2 text-left text-xs font-semibold text-steel-500">Empleado</th>
-                    <th className="px-5 py-2 text-left text-xs font-semibold text-steel-500">Fecha</th>
-                    <th className="px-5 py-2 text-right text-xs font-semibold text-steel-500">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentSales.map((sale) => (
-                    <tr key={sale.id} className="border-b border-steel-50">
-                      <td className="px-5 py-2 font-mono font-semibold">#{sale.sale_number}</td>
-                      <td className="px-5 py-2 text-steel-600">{sale.employees?.full_name || 'N/A'}</td>
-                      <td className="px-5 py-2 text-steel-500">{formatDateTime(sale.created_at)}</td>
-                      <td className="px-5 py-2 text-right font-mono font-bold text-brand-700">
-                        {formatCurrency(sale.total)}
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[360px] text-sm">
+                  <thead>
+                    <tr className="border-b border-steel-100 bg-steel-50/50">
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-steel-500">N°</th>
+                      <th className="hidden px-4 py-2 text-left text-xs font-semibold text-steel-500 sm:table-cell">Empleado</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-steel-500">Fecha</th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-steel-500">Total</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {recentSales.map((sale) => (
+                      <tr key={sale.id} className="border-b border-steel-50">
+                        <td className="px-4 py-2 font-mono font-semibold">#{sale.sale_number}</td>
+                        <td className="hidden px-4 py-2 text-steel-600 sm:table-cell">{sale.employees?.full_name || 'N/A'}</td>
+                        <td className="px-4 py-2 text-steel-500">{formatDateTime(sale.created_at)}</td>
+                        <td className="px-4 py-2 text-right font-mono font-bold text-brand-700">
+                          {formatCurrency(sale.total)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>

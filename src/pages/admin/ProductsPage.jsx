@@ -10,7 +10,7 @@ import {
   updateProduct,
   toggleProductActive,
   uploadProductImage,
-} from '../../api/supabaseApi';
+} from '../../api/demoApi';
 import { formatCurrency } from '../../utils/formatters';
 import PageHeader from '../../components/ui/PageHeader';
 import Modal from '../../components/ui/Modal';
@@ -184,7 +184,7 @@ export default function ProductsPage() {
   if (loading) return <Spinner size="lg" />;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title="Productos"
         description={`${products.length} productos registrados`}
@@ -236,7 +236,7 @@ export default function ProductsPage() {
         ) : (
           <div className="card overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[640px] text-sm">
                 <thead>
                   <tr className="border-b border-steel-200 bg-steel-50/50">
                     <th className="px-5 py-3 text-left font-semibold text-steel-600">Imagen</th>

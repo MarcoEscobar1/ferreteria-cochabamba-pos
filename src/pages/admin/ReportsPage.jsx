@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchSales, fetchProducts, fetchEmployees } from '../../api/supabaseApi';
+import { fetchSales, fetchProducts, fetchEmployees } from '../../api/demoApi';
 import { formatCurrency, formatDateTime, formatDate } from '../../utils/formatters';
 import { generateReportPDF } from '../../utils/pdfExport';
 import { exportToExcel } from '../../utils/excelExport';
@@ -176,11 +176,12 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader title="Reportes" description="Genera y exporta reportes del negocio" />
 
-      {/* Tabs */}
-      <div className="mt-6 flex gap-1 rounded-xl bg-steel-100 p-1">
+      {/* Tabs - horizontally scrollable on mobile */}
+      <div className="mt-4 overflow-x-auto">
+        <div className="flex min-w-max gap-1 rounded-xl bg-steel-100 p-1">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -195,22 +196,23 @@ export default function ReportsPage() {
             {tab.label}
           </button>
         ))}
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="mt-4 flex flex-wrap items-end gap-3">
+      <div className="mt-4 flex flex-wrap items-end gap-2">
         <div>
           <label className="mb-1 block text-xs font-medium text-steel-500">Desde</label>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input-field w-44" />
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input-field w-36 sm:w-44" />
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-steel-500">Hasta</label>
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="input-field w-44" />
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="input-field w-36 sm:w-44" />
         </div>
         {activeTab === 'by-employee' && (
           <div>
             <label className="mb-1 block text-xs font-medium text-steel-500">Empleado</label>
-            <select value={selectedEmployee} onChange={(e) => setSelectedEmployee(e.target.value)} className="input-field w-52">
+            <select value={selectedEmployee} onChange={(e) => setSelectedEmployee(e.target.value)} className="input-field w-40 sm:w-52">
               <option value="">Todos</option>
               {employees.map((emp) => (
                 <option key={emp.id} value={emp.id}>{emp.full_name}</option>
@@ -226,10 +228,10 @@ export default function ReportsPage() {
 
         <div className="ml-auto flex gap-2">
           <button onClick={() => handleExport(activeTab, 'pdf')} className="btn-secondary text-sm">
-            <HiOutlineDownload className="h-4 w-4" /> PDF
+            <HiOutlineDownload className="h-4 w-4" /> <span className="hidden sm:inline">PDF</span><span className="sm:hidden">PDF</span>
           </button>
           <button onClick={() => handleExport(activeTab, 'excel')} className="btn-secondary text-sm">
-            <HiOutlineTable className="h-4 w-4" /> Excel
+            <HiOutlineTable className="h-4 w-4" /> <span className="hidden sm:inline">Excel</span><span className="sm:hidden">XLS</span>
           </button>
         </div>
       </div>
@@ -263,7 +265,7 @@ export default function ReportsPage() {
                 ) : (
                   <div className="card overflow-hidden">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
+                      <table className="w-full min-w-[480px] text-sm">
                         <thead>
                           <tr className="border-b border-steel-200 bg-steel-50/50">
                             <th className="px-5 py-3 text-left font-semibold text-steel-600">N°</th>
@@ -301,7 +303,7 @@ export default function ReportsPage() {
                 ) : (
                   <div className="card overflow-hidden">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
+                      <table className="w-full min-w-[380px] text-sm">
                         <thead>
                           <tr className="border-b border-steel-200 bg-steel-50/50">
                             <th className="px-5 py-3 text-left font-semibold text-steel-600">Empleado</th>
@@ -340,7 +342,7 @@ export default function ReportsPage() {
                 ) : (
                   <div className="card overflow-hidden">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
+                      <table className="w-full min-w-[300px] text-sm">
                         <thead>
                           <tr className="border-b border-steel-200 bg-steel-50/50">
                             <th className="px-5 py-3 text-left font-semibold text-steel-600">Fecha</th>
@@ -394,7 +396,7 @@ export default function ReportsPage() {
                 ) : (
                   <div className="card overflow-hidden">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
+                      <table className="w-full min-w-[500px] text-sm">
                         <thead>
                           <tr className="border-b border-steel-200 bg-steel-50/50">
                             <th className="px-5 py-3 text-left font-semibold text-steel-600">Producto</th>

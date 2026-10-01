@@ -1,8 +1,29 @@
+# Dependencias
 node_modules
+
+# Build
 dist
+
+# Variables de entorno (si las hubiera)
 .env
 .env.local
+.env.*.local
 
-# Base de datos - no subir esquema SQL
-supabase/
-*.sql
+# Editor
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
