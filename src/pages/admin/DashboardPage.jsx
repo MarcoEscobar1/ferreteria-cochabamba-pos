@@ -68,21 +68,21 @@ export default function DashboardPage() {
   return (
     <div className="p-4 sm:p-6">
       <PageHeader
-        title="Dashboard"
+        title="Resumen"
         description={`Resumen del día — ${new Date().toLocaleDateString('es-BO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
       />
 
       {/* Stat Cards */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="mt-4 grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         {statCards.map((stat) => (
-          <div key={stat.label} className="card p-5">
-            <div className="flex items-center gap-4">
-              <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.color}`}>
+          <div key={stat.label} className="card min-w-0 p-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stat.color}`}>
                 <stat.icon className="h-6 w-6" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm text-steel-500">{stat.label}</p>
-                <p className="font-display text-2xl font-bold text-steel-900">{stat.value}</p>
+                <p className="break-words font-display text-xl font-bold tabular-nums text-steel-900">{stat.value}</p>
               </div>
             </div>
           </div>

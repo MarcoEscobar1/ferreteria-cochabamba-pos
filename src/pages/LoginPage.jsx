@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import toast from 'react-hot-toast';
-import { HiOutlineEye, HiOutlineEyeOff, HiOutlineInformationCircle } from 'react-icons/hi';
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineUser, HiOutlineOfficeBuilding } from 'react-icons/hi';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -31,18 +31,21 @@ export default function LoginPage() {
     }
   };
 
-  const fillDemo = (role) => {
-    if (role === 'admin') {
-      setEmail('admin@ferreteria.com');
-      setPassword('admin123');
-    } else {
-      setEmail('empleado@ferreteria.com');
-      setPassword('emp123');
+  const fillDemo = async (role) => {
+    setLoading(true);
+    try {
+      await signIn(role === 'admin' ? 'admin@ferreteria.com' : 'empleado@ferreteria.com', role === 'admin' ? 'admin123' : 'emp123');
+      navigate(role === 'admin' ? '/admin' : '/pos', { replace: true });
+      toast.success('Bienvenido');
+    } catch (err) {
+      toast.error(err.message || 'No se pudo iniciar sesión');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-steel-950">
+    <div className="relative flex min-h-dvh items-center justify-center bg-steel-950 py-8 sm:py-12">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -65,29 +68,30 @@ export default function LoginPage() {
         {/* Demo credentials hint */}
         <div className="mb-4 rounded-xl border border-brand-500/30 bg-brand-600/10 p-4">
           <div className="flex items-start gap-2 mb-3">
-            <HiOutlineInformationCircle className="h-5 w-5 shrink-0 text-brand-400 mt-0.5" />
-            <p className="text-xs text-brand-300 font-medium">Modo Demo — Acceso rápido:</p>
+            <p className="text-sm text-brand-200 font-medium">Acceso rápido</p>
           </div>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => fillDemo('admin')}
-              className="flex-1 rounded-lg bg-brand-600/20 px-3 py-2 text-xs font-medium text-brand-300 hover:bg-brand-600/30 transition-colors border border-brand-500/20"
+              disabled={loading}
+              className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-500/20 bg-brand-600/20 px-3 py-2 text-sm font-medium text-brand-200 transition-colors hover:bg-brand-600/30 disabled:opacity-50"
             >
-              👨‍💼 Admin
+              <HiOutlineOfficeBuilding className="h-5 w-5 shrink-0" /> Admin
             </button>
             <button
               type="button"
               onClick={() => fillDemo('employee')}
-              className="flex-1 rounded-lg bg-steel-700/50 px-3 py-2 text-xs font-medium text-steel-300 hover:bg-steel-700/70 transition-colors border border-steel-600/20"
+              disabled={loading}
+              className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-steel-600/20 bg-steel-700/50 px-3 py-2 text-sm font-medium text-steel-200 transition-colors hover:bg-steel-700/70 disabled:opacity-50"
             >
-              👷 Empleado
+              <HiOutlineUser className="h-5 w-5 shrink-0" /> Empleado
             </button>
           </div>
         </div>
 
         {/* Login Card */}
-        <div className="card p-8">
+        <div className="card p-5 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-steel-700">
@@ -116,14 +120,16 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-field pr-10"
+                  className="input-field pr-14"
                   placeholder="••••••••"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-steel-400 hover:text-steel-600"
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-pressed={showPassword}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 text-steel-500 hover:text-steel-700"
                 >
                   {showPassword ? <HiOutlineEyeOff className="h-5 w-5" /> : <HiOutlineEye className="h-5 w-5" />}
                 </button>

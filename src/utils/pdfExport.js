@@ -47,7 +47,7 @@ export function generateReceiptPDF(sale) {
     headStyles: { fillColor: [51, 53, 70], textColor: 255, fontStyle: 'bold' },
     head: [['Producto', 'Cant', 'P.Unit', 'Subtotal']],
     body: (sale.sale_items || []).map((item) => [
-      item.product_name,
+      item.product_name || item.products?.name || 'Producto',
       item.quantity,
       formatCurrency(item.unit_price),
       formatCurrency(item.subtotal),

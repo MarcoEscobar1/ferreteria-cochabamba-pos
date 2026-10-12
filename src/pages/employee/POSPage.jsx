@@ -7,6 +7,7 @@ import { generateReceiptPDF } from '../../utils/pdfExport';
 import StockBadge from '../../components/ui/StockBadge';
 import Spinner from '../../components/ui/Spinner';
 import ReceiptModal from '../../components/pos/ReceiptModal';
+import Modal from '../../components/ui/Modal';
 import toast from 'react-hot-toast';
 import {
   HiOutlineSearch,
@@ -74,6 +75,7 @@ export default function POSPage() {
   };
 
   const handleProcessSale = async () => {
+    if (processing) return;
     if (cartItems.length === 0) {
       toast.error('El carrito está vacío');
       return;
@@ -120,8 +122,8 @@ export default function POSPage() {
   const itemCount = getItemCount();
 
   // ─── Cart Panel (shared between mobile/desktop) ───────────────────────────
-  const CartPanel = ({ onClose }) => (
-    <div className="flex h-full flex-col bg-white">
+  const renderCart = (onClose) => (
+    <div className="flex min-h-0 flex-1 flex-col bg-white">
       {/* Cart header */}
       <div className="border-b border-steel-200 px-5 py-4">
         <div className="flex items-center justify-between">
@@ -132,7 +134,7 @@ export default function POSPage() {
             )}
             {/* Close button on mobile cart sheet */}
             {onClose && (
-              <button onClick={onClose} className="rounded-lg p-1.5 text-steel-400 hover:bg-steel-100 lg:hidden">
+              <button onClick={onClose} aria-label="Cerrar carrito" className="rounded-lg p-1.5 text-steel-400 hover:bg-steel-100 xl:hidden">
                 <HiOutlineX className="h-5 w-5" />
               </button>
             )}
@@ -144,6 +146,7 @@ export default function POSPage() {
       <div className="border-b border-steel-100 px-5 py-3">
         <input
           type="text"
+          aria-label="Nombre del cliente"
           placeholder="Nombre del cliente (opcional)"
           value={customerName}
           onChange={(e) => setCustomerName(e.target.value)}
@@ -152,7 +155,7 @@ export default function POSPage() {
       </div>
 
       {/* Cart items */}
-      <div className="flex-1 overflow-y-auto px-5 py-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3">
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <HiOutlineShoppingCart className="h-10 w-10 text-steel-300" />
@@ -177,6 +180,7 @@ export default function POSPage() {
                   </div>
                   <button
                     onClick={() => removeItem(item.product_id)}
+                    aria-label={`Quitar ${item.product_name}`}
                     className="rounded-lg p-1 text-steel-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                   >
                     <HiOutlineTrash className="h-4 w-4" />
@@ -187,6 +191,7 @@ export default function POSPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                      aria-label={`Reducir cantidad de ${item.product_name}`}
                       className="rounded-lg border border-steel-200 bg-white p-1 text-steel-600 hover:bg-steel-50 transition-colors"
                     >
                       <HiOutlineMinus className="h-3.5 w-3.5" />
@@ -195,6 +200,7 @@ export default function POSPage() {
                       {item.quantity}
                     </span>
                     <button
+                      aria-label={`Aumentar cantidad de ${item.product_name}`}
                       onClick={() => {
                         if (item.quantity < item.stock) {
                           updateQuantity(item.product_id, item.quantity + 1);
@@ -256,9 +262,9 @@ export default function POSPage() {
   );
 
   return (
-    <div className="flex h-full flex-col lg:flex-row overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col xl:flex-row overflow-hidden">
       {/* ─── Products section ─────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Search & Filters */}
         <div className="border-b border-steel-200 bg-white px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -266,6 +272,7 @@ export default function POSPage() {
               <HiOutlineSearch className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-steel-400" />
               <input
                 type="text"
+                aria-label="Buscar producto"
                 placeholder="Buscar producto..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -273,6 +280,7 @@ export default function POSPage() {
               />
             </div>
             <select
+              aria-label="Filtrar por categoría"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="input-field sm:w-44"
@@ -286,14 +294,14 @@ export default function POSPage() {
         </div>
 
         {/* Products Grid */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-28 sm:p-6 sm:pb-28 xl:pb-6">
           {filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <HiOutlineShoppingCart className="h-12 w-12 text-steel-300" />
               <p className="mt-3 text-sm text-steel-500">No se encontraron productos</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 2xl:grid-cols-4">
               {filteredProducts.map((product) => (
                 <button
                   key={product.id}
@@ -322,7 +330,7 @@ export default function POSPage() {
                   {/* Info */}
                   <div className="p-2 sm:p-3">
                     <p className="truncate text-[10px] text-steel-400 sm:text-xs">{product.categories?.name || 'Sin categoría'}</p>
-                    <h3 className="mt-0.5 truncate text-xs font-semibold text-steel-900 sm:text-sm">{product.name}</h3>
+                    <h3 className="mt-0.5 line-clamp-2 min-h-8 text-xs font-semibold text-steel-900 sm:min-h-10 sm:text-sm">{product.name}</h3>
                     <div className="mt-1.5 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                       <span className="font-mono text-sm font-bold text-brand-700 sm:text-base">
                         {formatCurrency(product.price)}
@@ -349,15 +357,15 @@ export default function POSPage() {
       </div>
 
       {/* ─── Desktop: Cart Sidebar ─────────────────────────────────── */}
-      <div className="hidden w-96 border-l border-steel-200 lg:flex lg:flex-col">
-        <CartPanel />
+      <div className="hidden w-80 shrink-0 border-l border-steel-200 xl:flex xl:flex-col 2xl:w-96">
+        {renderCart()}
       </div>
 
       {/* ─── Mobile: Floating Cart Button ──────────────────────────── */}
       {!showMobileCart && (
         <button
           onClick={() => setShowMobileCart(true)}
-          className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full bg-brand-600 px-5 py-3.5 text-sm font-semibold text-white shadow-xl shadow-brand-600/40 transition-all hover:bg-brand-700 active:scale-95 lg:hidden"
+          className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-4 z-30 flex max-w-[calc(100vw-2rem)] items-center gap-2 rounded-full bg-brand-700 px-5 py-3.5 text-sm font-semibold text-white shadow-xl transition-colors hover:bg-brand-800 xl:hidden"
         >
           <HiOutlineShoppingCart className="h-5 w-5" />
           {itemCount > 0 ? (
@@ -378,22 +386,9 @@ export default function POSPage() {
 
       {/* ─── Mobile: Cart Sheet Overlay ────────────────────────────── */}
       {showMobileCart && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-steel-950/50 backdrop-blur-sm lg:hidden"
-            onClick={() => setShowMobileCart(false)}
-          />
-          <div
-            className="fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-2xl bg-white shadow-2xl lg:hidden"
-            style={{ maxHeight: '85dvh', animation: 'cartUp 0.25s ease-out' }}
-          >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="h-1 w-10 rounded-full bg-steel-300" />
-            </div>
-            <CartPanel onClose={() => setShowMobileCart(false)} />
-          </div>
-        </>
+        <Modal open onClose={() => setShowMobileCart(false)} title="Carrito" size="md">
+          <div className="flex h-[70dvh] min-h-0 flex-col">{renderCart()}</div>
+        </Modal>
       )}
 
       <style>{`

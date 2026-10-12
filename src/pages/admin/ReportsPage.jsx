@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchSales, fetchProducts, fetchEmployees } from '../../api/demoApi';
-import { formatCurrency, formatDateTime, formatDate } from '../../utils/formatters';
+import { formatCurrency, formatDateTime, formatDate, formatDateISO } from '../../utils/formatters';
 import { generateReportPDF } from '../../utils/pdfExport';
 import { exportToExcel } from '../../utils/excelExport';
 import PageHeader from '../../components/ui/PageHeader';
@@ -38,9 +38,9 @@ export default function ReportsPage() {
     try {
       const [salesData, productsData, employeesData] = await Promise.all([
         fetchSales({
-          startDate: startDate ? new Date(startDate).toISOString() : null,
-          endDate: endDate ? new Date(endDate + 'T23:59:59').toISOString() : null,
-          employeeId: selectedEmployee || null,
+          startDate: startDate ? new Date(startDate + 'T00:00:00').toISOString() : null,
+          endDate: endDate ? new Date(endDate + 'T23:59:59.999').toISOString() : null,
+          employeeId: activeTab === 'by-employee' ? selectedEmployee || null : null,
         }),
         fetchProducts({ activeOnly: false }),
         fetchEmployees(),
@@ -53,7 +53,7 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  }, [startDate, endDate, selectedEmployee]);
+  }, [startDate, endDate, selectedEmployee, activeTab]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -76,14 +76,14 @@ export default function ReportsPage() {
   // Daily summary
   const dailySummary = {};
   sales.forEach((sale) => {
-    const day = formatDate(sale.created_at);
+    const day = formatDateISO(sale.created_at);
     if (!dailySummary[day]) {
-      dailySummary[day] = { date: day, count: 0, total: 0 };
+      dailySummary[day] = { date: formatDate(sale.created_at), sortDate: day, count: 0, total: 0 };
     }
     dailySummary[day].count += 1;
     dailySummary[day].total += Number(sale.total);
   });
-  const dailyData = Object.values(dailySummary).sort((a, b) => b.date.localeCompare(a.date));
+  const dailyData = Object.values(dailySummary).sort((a, b) => b.sortDate.localeCompare(a.sortDate));
 
   // Inventory data
   const inventoryData = products.map((p) => ({

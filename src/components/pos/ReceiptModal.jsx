@@ -27,7 +27,7 @@ export default function ReceiptModal({ sale, onClose, onDownload }) {
       </div>
 
       {/* Printable Receipt */}
-      <div ref={receiptRef} className="print-area rounded-xl border border-steel-200 bg-white p-6">
+      <div ref={receiptRef} className="print-area rounded-xl border border-steel-200 bg-white p-3 sm:p-6">
         <div className="text-center">
           <h2 className="font-display text-lg font-bold text-steel-900">FERRETERÍA COCHABAMBA</h2>
           <p className="text-xs text-steel-500">Cochabamba, Bolivia</p>
@@ -60,19 +60,19 @@ export default function ReceiptModal({ sale, onClose, onDownload }) {
 
         <div className="my-4 border-t border-dashed border-steel-300" />
 
-        <table className="w-full text-sm">
+        <table className="w-full table-fixed text-[10px] sm:text-sm">
           <thead>
             <tr className="border-b border-steel-200 text-left text-xs text-steel-500">
-              <th className="pb-2">Producto</th>
-              <th className="pb-2 text-center">Cant</th>
-              <th className="pb-2 text-right">P.Unit</th>
-              <th className="pb-2 text-right">Subtotal</th>
+              <th className="w-[34%] pb-2">Producto</th>
+              <th className="w-[12%] pb-2 text-center">Cant</th>
+              <th className="w-[27%] pb-2 text-right">P.Unit</th>
+              <th className="w-[27%] pb-2 text-right">Subtotal</th>
             </tr>
           </thead>
           <tbody>
             {(sale.sale_items || []).map((item, i) => (
               <tr key={i} className="border-b border-steel-100">
-                <td className="py-1.5 pr-2">{item.product_name}</td>
+                <td className="break-words py-1.5 pr-2">{item.product_name || item.products?.name}</td>
                 <td className="py-1.5 text-center">{item.quantity}</td>
                 <td className="py-1.5 text-right">{formatCurrency(item.unit_price)}</td>
                 <td className="py-1.5 text-right font-medium">{formatCurrency(item.subtotal)}</td>
@@ -96,7 +96,7 @@ export default function ReceiptModal({ sale, onClose, onDownload }) {
         </div>
       </div>
 
-      <div className="mt-4 flex gap-3">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <button onClick={handlePrint} className="btn-secondary flex-1">
           <HiOutlinePrinter className="h-4 w-4" />
           Imprimir

@@ -38,6 +38,8 @@ export const useCartStore = create((set, get) => ({
   },
 
   updateQuantity: (productId, quantity) => {
+    const item = get().items.find((entry) => entry.product_id === productId);
+    if (!item || !Number.isInteger(quantity) || quantity > item.stock) return false;
     if (quantity <= 0) {
       get().removeItem(productId);
       return;

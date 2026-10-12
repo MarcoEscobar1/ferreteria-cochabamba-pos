@@ -25,8 +25,8 @@ export default function SalesHistoryPage() {
     try {
       const data = await fetchSales({
         employeeId: employee.id,
-        startDate: startDate ? new Date(startDate).toISOString() : null,
-        endDate: endDate ? new Date(endDate + 'T23:59:59').toISOString() : null,
+        startDate: startDate ? new Date(startDate + 'T00:00:00').toISOString() : null,
+        endDate: endDate ? new Date(endDate + 'T23:59:59.999').toISOString() : null,
       });
       setSales(data);
     } catch (err) {

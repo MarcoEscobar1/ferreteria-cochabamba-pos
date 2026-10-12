@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import useDrawerFocus from './useDrawerFocus';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import toast from 'react-hot-toast';
@@ -27,7 +28,8 @@ export default function EmployeeLayout() {
     navigate('/login');
   };
 
-  const closeSidebar = () => setSidebarOpen(false);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+  const drawerRef = useDrawerFocus(sidebarOpen, closeSidebar);
 
   const SidebarContent = ({ onNavClick }) => (
     <>
@@ -100,7 +102,7 @@ export default function EmployeeLayout() {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-dvh overflow-hidden">
       {/* ── MOBILE: Overlay ── */}
       {sidebarOpen && (
         <div
@@ -111,12 +113,16 @@ export default function EmployeeLayout() {
 
       {/* ── Sidebar (drawer on mobile, fixed on desktop) ── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-steel-200 bg-white shadow-xl transition-transform duration-300 ease-in-out lg:static lg:w-64 lg:translate-x-0 lg:shadow-none ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        ref={drawerRef}
+        id="main-navigation"
+        aria-label="Navegación principal"
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[90vw] shrink-0 flex-col border-r border-steel-200 bg-white shadow-xl transition-transform duration-300 ease-in-out lg:static lg:visible lg:w-64 lg:translate-x-0 lg:shadow-none ${
+          sidebarOpen ? 'translate-x-0 visible' : '-translate-x-full invisible'
         }`}
       >
         <button
           onClick={closeSidebar}
+          aria-label="Cerrar menú"
           className="absolute right-3 top-3.5 rounded-lg p-1.5 text-steel-400 hover:bg-steel-100 lg:hidden"
         >
           <HiOutlineX className="h-5 w-5" />
@@ -125,13 +131,15 @@ export default function EmployeeLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* ── MOBILE/TABLET: Top Header Bar ── */}
         <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-steel-200 bg-white px-4 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             className="rounded-lg p-2 text-steel-600 hover:bg-steel-100 transition-colors"
             aria-label="Abrir menú"
+            aria-expanded={sidebarOpen}
+            aria-controls="main-navigation"
           >
             <HiOutlineMenu className="h-5 w-5" />
           </button>
@@ -152,7 +160,7 @@ export default function EmployeeLayout() {
           </button>
         </header>
 
-        <main className="flex-1 overflow-hidden bg-steel-50">
+        <main className="min-h-0 flex-1 overflow-y-auto bg-steel-50">
           <Outlet />
         </main>
       </div>

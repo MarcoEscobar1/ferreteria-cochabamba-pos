@@ -76,8 +76,8 @@ export async function updateProduct(id, updates) {
   products[idx] = {
     ...products[idx],
     ...safeUpdates,
-    categories: catName ? { name: catName } : products[idx].categories,
-    suppliers: supName ? { name: supName } : products[idx].suppliers,
+    categories: 'category_id' in safeUpdates ? (catName ? { name: catName } : null) : products[idx].categories,
+    suppliers: 'supplier_id' in safeUpdates ? (supName ? { name: supName } : null) : products[idx].suppliers,
   };
   return products[idx];
 }
@@ -186,8 +186,9 @@ export async function fetchEmployees({ activeOnly = false } = {}) {
 
 export async function createEmployee({ email, full_name, phone, role, password }) {
   await delay();
+  email = email.trim().toLowerCase();
   // Verificar que el email no exista
-  if (employees.find((e) => e.email === email)) {
+  if (employees.find((e) => e.email.toLowerCase() === email)) {
     throw new Error('Ya existe un empleado con ese correo electrónico');
   }
   const newEmp = {
@@ -226,15 +227,26 @@ export async function toggleEmployeeActive(id, isActive) {
 export async function processSale(saleData) {
   await delay();
   const { employee_id, customer_name, items } = saleData;
+  if (!employees.some((employee) => employee.id === employee_id && employee.is_active)) {
+    throw new Error('Empleado no disponible para registrar ventas');
+  }
+  if (!Array.isArray(items) || items.length === 0) throw new Error('El carrito está vacío');
+  const quantities = new Map();
+  for (const item of items) {
+    if (!Number.isInteger(item.quantity) || item.quantity <= 0) throw new Error('Cantidad inválida');
+    quantities.set(item.product_id, (quantities.get(item.product_id) || 0) + item.quantity);
+  }
 
   // Validar stock y calcular totales
   const saleItems = [];
   let total = 0;
 
-  for (const item of items) {
+  for (const [product_id, quantity] of quantities) {
+    const item = { product_id, quantity };
     const productIdx = products.findIndex((p) => p.id === item.product_id);
     if (productIdx === -1) throw new Error(`Producto ${item.product_id} no encontrado`);
     const product = products[productIdx];
+    if (!product.is_active) throw new Error(`El producto "${product.name}" está inactivo`);
 
     if (product.stock < item.quantity) {
       throw new Error(`Stock insuficiente para "${product.name}"`);
@@ -246,14 +258,19 @@ export async function processSale(saleData) {
     saleItems.push({
       id: generateId('si'),
       product_id: item.product_id,
+      product_name: product.name,
       quantity: item.quantity,
       unit_price: product.price,
       subtotal,
       products: { name: product.name, image_url: product.image_url },
     });
 
-    // Descontar stock
-    products[productIdx] = { ...products[productIdx], stock: product.stock - item.quantity };
+  }
+
+  // Commit stock only after every item has passed validation.
+  for (const item of saleItems) {
+    const idx = products.findIndex((product) => product.id === item.product_id);
+    products[idx] = { ...products[idx], stock: products[idx].stock - item.quantity };
   }
 
   const saleNumber = generateSaleNumber();

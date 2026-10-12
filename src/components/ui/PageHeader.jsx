@@ -7,7 +7,7 @@ export default function PageHeader({ title, description, actions }) {
           <p className="mt-1 text-sm text-steel-500">{description}</p>
         )}
       </div>
-      {actions && <div className="flex flex-shrink-0 items-center gap-3">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-3">{actions}</div>}
     </div>
   );
 }
